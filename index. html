@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday!</title>
+  <!-- Confetti JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+      padding: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      max-width: 450px;
+      width: 100%;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .cake-emoji {
+      font-size: 70px;
+      margin-bottom: 10px;
+      animation: bounce 2s infinite;
+      display: inline-block;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #ff758c, #ff7eb3);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(255, 117, 140, 0.6);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .message-box {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.6s ease-in-out;
+      margin-top: 0;
+      background: #fff5f8;
+      border-radius: 12px;
+      border-left: 4px solid #ff758c;
+      text-align: left;
+    }
+
+    .message-box.open {
+      max-height: 250px;
+      opacity: 1;
+      margin-top: 25px;
+      padding: 20px;
+    }
+
+    .message-box p {
+      color: #444;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .signature {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #ff758c;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="cake-emoji">🎂</div>
+    <h1>Happy Birthday!</h1>
+    <p class="subtitle">A special wish just for you ✨</p>
+
+    <button class="btn" onclick="revealWish()">Click to Open Surprise 🎁</button>
+
+    <div class="message-box" id="wishBox">
+      <p>Wishing you a day filled with laughter, love, and endless happiness! May all your dreams come true this year.</p>
+      <div class="signature">— Best Wishes ❤️</div>
+    </div>
+  </div>
+
+  <script>
+    function revealWish() {
+      const box = document.getElementById('wishBox');
+      box.classList.add('open');
+
+      // Trigger Confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
+
+</body>
+</html>
