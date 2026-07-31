@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>A Magical Birthday Surprise</title>
+  
+  <!-- Confetti JS -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts for handwriting and clean text -->
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Playfair+Display:ital,wght@0,500;1,500&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      /* Beautiful Pink Silk/Pastel Gradient */
+      background: linear-gradient(135deg, #ffe6f0 0%, #ffcbe0 50%, #ffaecf 100%);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #4a4a4a;
+    }
+
+    /* FALLING SNOW / SHINING EFFECT */
+    #snow-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none; /* Lets clicks pass through */
+      z-index: 9999;
+    }
+    
+    .snowflake {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) translateX(0); opacity: 1; }
+      100% { transform: translateY(105vh) translateX(20px); opacity: 0; }
+    }
+
+    /* PAGE LAYOUT */
+    .page {
+      display: none; 
+      min-height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-in-out;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page.active {
+      display: flex; 
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* CONTAINER CARD */
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 40px 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 15px 35px rgba(255, 150, 180, 0.2);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 { 
+      font-family: 'Playfair Display', serif;
+      color: #d16b8a; 
+      font-size: 2.5rem; 
+      margin-bottom: 15px; 
+    }
+    
+    p { font-size: 1rem; margin-bottom: 25px; line-height: 1.6; }
+
+    /* ROSE GOLD BUTTONS */
+    .btn {
+      background: linear-gradient(45deg, #d887a3, #e6a8b6);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(216, 135, 163, 0.4);
+      transition: all 0.3s ease;
+      margin-top: 15px;
+      letter-spacing: 1px;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(216, 135, 163, 0.6); }
+    .btn:active { transform: translateY(1px); }
+
+    /* PAGE 1: LOCK */
+    .lock-icon { font-size: 60px; margin-bottom: 10px; }
+    .password-input {
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid #e6a8b6;
+      background: rgba(255,255,255,0.9);
+      border-radius: 10px;
+      width: 80%;
+      max-width: 250px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 15px;
+      color: #d16b8a;
+    }
+    .password-input:focus { border-color: #d16b8a; }
+    .error-msg { color: #ff4757; font-size: 0.9rem; display: none; margin-top: -10px; margin-bottom: 10px; }
+
+    /* PAGE 2: MEMORIES (FIXED PHOTOS) */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .polaroid {
+      background: white;
+      padding: 12px 12px 25px 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      width: 160px;
+      transition: transform 0.3s ease;
+    }
+    
+    .polaroid:nth-child(odd) { transform: rotate(-3deg); }
+    .polaroid:nth-child(even) { transform: rotate(4deg); }
+    .polaroid:hover { transform: scale(1.08) rotate(0deg); z-index: 10; }
+    
+    /* THIS IS THE FIX FOR THE FACES */
+    .polaroid img { 
+      width: 100%; 
+      height: 160px; /* Forces a square aspect ratio */
+      object-fit: cover; /* Smart crops the image instead of stretching */
+      object-position: center 20%; /* Focuses slightly near the top where faces are */
+      border-radius: 2px; 
+    }
+    
+    .polaroid .caption { 
+      font-family: 'Caveat', cursive; 
+      font-size: 1.4rem; 
+      color: #555; 
+      margin-top: 8px; 
+    }
+
+    /* PAGE 3: CAKE */
+    .cake-emoji { font-size: 110px; margin: 20px 0; transition: transform 0.4s ease; }
+    .cake-emoji.cut { transform: scale(1.15); }
+    #nextAfterCake { display: none; }
+
+    /* PAGE 4: LETTER */
+    .letter-box {
+      background: #fffafa;
+      border-radius: 8px;
+      padding: 35px 30px;
+      text-align: left;
+      box-shadow: inset 0 0 15px rgba(216, 135, 163, 0.1);
+      border: 1px solid #ffe6f0;
+    }
+    .letter-box p {
+      font-family: 'Caveat', cursive;
+      font-size: 1.7rem;
+      color: #5a4b50;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    .signature {
+      font-family: 'Caveat', cursive;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #d887a3;
+      text-align: right;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Snow Container -->
+  <div id="snow-container"></div>
+
+  <!-- PAGE 1: THE LOCK -->
+  <div id="page1" class="page active">
+    <div class="container">
+      <div class="lock-icon">🗝️</div>
+      <h1>Enter the Magic Code</h1>
+      <p>Please enter your special passcode to unlock your birthday gift!</p>
+      
+      <input type="text" id="passcodeInput" class="password-input" placeholder="Hint: bestie">
+      <div id="errorMsg" class="error-msg">Incorrect code, try again!</div>
+      <br>
+      <button class="btn" onclick="checkPassword()">Unlock Secret ✨</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2: MEMORIES -->
+  <div id="page2" class="page">
+    <div class="container" style="max-width: 700px;">
+      <h1>Always Together 📸</h1>
+      <p>Before we cut the cake, let's look back at some beautiful moments...</p>
+      
+      <div class="gallery">
+        <!-- Photo 1 -->
+        <div class="polaroid">
+          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=400&q=80" alt="Memory 1">
+          <div class="caption">My Favorite Duo</div>
+        </div>
+        <!-- Photo 2 -->
+        <div class="polaroid">
+          <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=400&q=80" alt="Memory 2">
+          <div class="caption">Remember this?</div>
+        </div>
+        <!-- Photo 3 -->
+        <div class="polaroid">
+          <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&w=400&q=80" alt="Memory 3">
+          <div class="caption">Best day ever</div>
+        </div>
+      </div>
+      
+      <button class="btn" onclick="goToPage('page3')">Next: Time for Cake! ➡️</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: CAKE CUTTING -->
+  <div id="page3" class="page">
+    <div class="container">
+      <h1>Make a Wish! 🕯️</h1>
+      <p>Close your eyes, make a wish, and click below to cut your beautiful cake.</p>
+      
+      <div id="cakeItem" class="cake-emoji">🎂</div>
+      
+      <button id="cutCakeBtn" class="btn" onclick="cutCake()">Cut the Cake 🔪</button>
+      <button id="nextAfterCake" class="btn" onclick="goToPage('page4')">Read Your Letter 💌</button>
+    </div>
+  </div>
+
+  <!-- PAGE 4: THE LETTER -->
+  <div id="page4" class="page">
+    <div class="container">
+      <h1>Happy Birthday! 🎉</h1>
+      
+      <div class="letter-box">
+        <p>Dear Bestie,</p>
+        <p>Happy Birthday! I love you for all that you are. I created this little website to show you how much you mean to me.</p>
+        <p>My beautiful best friend, thank you for being my rock, my partner in crime, and my favorite person to laugh with. I hope this coming year brings you all the joy and happiness you deserve.</p>
+        <p>Let's make even more amazing memories together!</p>
+        <div class="signature">Love always, <br>— [Your Name] 💖</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- SNOW / SHINING EFFECT LOGIC ---
+    function createSnowflake() {
+      const snow = document.createElement('div');
+      snow.classList.add('snowflake');
+      
+      // Randomize position, size, speed, and opacity for a natural look
+      snow.style.left = Math.random() * 100 + 'vw';
+      snow.style.width = Math.random() * 6 + 3 + 'px';
+      snow.style.height = snow.style.width;
+      snow.style.animationDuration = Math.random() * 3 + 4 + 's';
+      snow.style.opacity = Math.random() * 0.5 + 0.3;
+      
+      document.getElementById('snow-container').appendChild(snow);
+      
+      // Remove snowflake after it falls to prevent lag
+      setTimeout(() => { snow.remove(); }, 7000);
+    }
+    // Generate a new snowflake every 150 milliseconds
+    setInterval(createSnowflake, 150);
+
+    // --- PAGE NAVIGATION LOGIC ---
+    function goToPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+      window.scrollTo(0,0);
+    }
+
+    // --- PASSCODE LOGIC ---
+    function checkPassword() {
+      const input = document.getElementById('passcodeInput').value.toLowerCase().trim();
+      const errorMsg = document.getElementById('errorMsg');
+      
+      if(input === 'bestie') {
+        errorMsg.style.display = 'none';
+        goToPage('page2');
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // --- CAKE & CONFETTI LOGIC ---
+    function cutCake() {
+      const cake = document.getElementById('cakeItem');
+      const cutBtn = document.getElementById('cutCakeBtn');
+      const nextBtn = document.getElementById('nextAfterCake');
+
+      cake.innerHTML = '🍰';
+      cake.classList.add('cut');
+
+      cutBtn.style.display = 'none';
+      nextBtn.style.display = 'inline-block';
+
+      // Elegant pink and gold confetti burst
+      confetti({
+        particleCount: 180,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#ffd1dc', '#ffb6c1', '#ff69b4', '#ffffff', '#ffd700']
+      });
+      
+      setTimeout(() => {
+        confetti({ particleCount: 120, spread: 130, origin: { y: 0.4 }, colors: ['#ffb6c1', '#ffffff'] });
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>
